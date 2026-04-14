@@ -1,0 +1,442 @@
+{
+  "info": {
+    "name": "Content Calendar API",
+    "_postman_id": "content-calendar-collection",
+    "description": "Full CRUD collection for the Spring Boot Content Calendar API.\n\nSet the `baseUrl` variable to switch between local and production:\n- Local: http://localhost:8080\n- Production: https://springbootdemo-production-42ec.up.railway.app",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string",
+      "description": "Switch to https://springbootdemo-production-42ec.up.railway.app for production"
+    },
+    {
+      "key": "contentId",
+      "value": "1",
+      "type": "string",
+      "description": "ID of a content item — update after creating one"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health & Actuator",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["actuator", "health"]
+            },
+            "description": "Returns application health status. Should return {\"status\":\"UP\"}."
+          },
+          "response": [
+            {
+              "name": "Healthy",
+              "status": "OK",
+              "code": 200,
+              "body": "{\"groups\":[\"liveness\",\"readiness\"],\"status\":\"UP\"}"
+            }
+          ]
+        },
+        {
+          "name": "Home",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": [""]
+            },
+            "description": "Root endpoint — sanity check that the app is responding."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "body": "Hello, Content Calendar!"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Content",
+      "item": [
+        {
+          "name": "Get All Content",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/content",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "content"]
+            },
+            "description": "Returns all content items. Returns an empty array [] when no items exist."
+          },
+          "response": [
+            {
+              "name": "List with items",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[\n  {\n    \"id\": 1,\n    \"title\": \"Spring Boot Crash Course\",\n    \"description\": \"A beginner crash course on Spring Boot\",\n    \"status\": \"PUBLISHED\",\n    \"type\": \"VIDEO\",\n    \"dateCreated\": \"2026-01-01T10:00:00\",\n    \"dateUpdated\": \"2026-01-01T10:00:00\",\n    \"url\": \"https://youtu.be/UgX5lgv4uVM\"\n  },\n  {\n    \"id\": 2,\n    \"title\": \"Getting Started with Spring Data JDBC\",\n    \"description\": \"Deep dive into Spring Data JDBC\",\n    \"status\": \"IN_PROGRESS\",\n    \"type\": \"ARTICLE\",\n    \"dateCreated\": \"2026-02-15T09:00:00\",\n    \"dateUpdated\": \"2026-02-15T09:00:00\",\n    \"url\": \"https://danvega.dev\"\n  }\n]"
+            },
+            {
+              "name": "Empty list",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[]"
+            }
+          ]
+        },
+        {
+          "name": "Get Content by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/content/{{contentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "content", "{{contentId}}"]
+            },
+            "description": "Returns a single content item by its ID. Returns 404 if not found."
+          },
+          "response": [
+            {
+              "name": "Found",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"title\": \"Spring Boot Crash Course\",\n  \"description\": \"A beginner crash course on Spring Boot\",\n  \"status\": \"PUBLISHED\",\n  \"type\": \"VIDEO\",\n  \"dateCreated\": \"2026-01-01T10:00:00\",\n  \"dateUpdated\": \"2026-01-01T10:00:00\",\n  \"url\": \"https://youtu.be/UgX5lgv4uVM\"\n}"
+            },
+            {
+              "name": "Not Found",
+              "status": "Not Found",
+              "code": 404,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Content not found\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Content (Article)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Building REST APIs with Spring Boot\",\n  \"description\": \"A comprehensive guide to building production-ready REST APIs\",\n  \"status\": \"IDEA\",\n  \"type\": \"ARTICLE\",\n  \"dateCreated\": \"2026-04-14T10:00:00\",\n  \"dateUpdated\": \"2026-04-14T10:00:00\",\n  \"url\": \"https://danvega.dev/rest-apis\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/content",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "content"]
+            },
+            "description": "Creates a new content item. Returns 201 Created on success.\n\nValid status values: IDEA, IN_PROGRESS, PUBLISHED\nValid type values: ARTICLE, VIDEO, COURSE\n\nRequired fields: title, status, type"
+          },
+          "response": [
+            {
+              "name": "Created",
+              "status": "Created",
+              "code": 201,
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Create Content (Video)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Spring Security Deep Dive\",\n  \"description\": \"Everything you need to know about securing Spring Boot apps\",\n  \"status\": \"IN_PROGRESS\",\n  \"type\": \"VIDEO\",\n  \"dateCreated\": \"2026-04-14T12:00:00\",\n  \"dateUpdated\": \"2026-04-14T12:00:00\",\n  \"url\": \"https://youtu.be/example\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/content",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "content"]
+            },
+            "description": "Creates a new VIDEO content item with IN_PROGRESS status."
+          },
+          "response": [
+            {
+              "name": "Created",
+              "status": "Created",
+              "code": 201,
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Create Content (Course)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Full Stack Spring Boot & React\",\n  \"description\": \"Build a full stack application with Spring Boot and React\",\n  \"status\": \"IDEA\",\n  \"type\": \"COURSE\",\n  \"dateCreated\": \"2026-04-14T14:00:00\",\n  \"dateUpdated\": \"2026-04-14T14:00:00\",\n  \"url\": null\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/content",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "content"]
+            },
+            "description": "Creates a new COURSE idea with no URL yet (url is optional)."
+          },
+          "response": [
+            {
+              "name": "Created",
+              "status": "Created",
+              "code": 201,
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Create Content — Validation Error",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"\",\n  \"description\": \"Missing required fields\",\n  \"status\": null,\n  \"type\": null\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/content",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "content"]
+            },
+            "description": "Intentionally invalid request to demonstrate validation error handling. Returns 400 with field-level error messages."
+          },
+          "response": [
+            {
+              "name": "Validation Error",
+              "status": "Bad Request",
+              "code": 400,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"title\": \"Title is required\",\n  \"status\": \"Status is required\",\n  \"type\": \"Type is required\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Content",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{contentId}},\n  \"title\": \"Spring Boot Crash Course (Updated)\",\n  \"description\": \"Updated description after re-recording\",\n  \"status\": \"PUBLISHED\",\n  \"type\": \"VIDEO\",\n  \"dateCreated\": \"2026-01-01T10:00:00\",\n  \"dateUpdated\": \"2026-04-14T10:00:00\",\n  \"url\": \"https://youtu.be/UgX5lgv4uVM\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/content/{{contentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "content", "{{contentId}}"]
+            },
+            "description": "Updates an existing content item. Returns 204 No Content on success.\n\nNote: the `id` in the body must match the `{id}` in the URL path.\nReturns 404 if the ID does not exist."
+          },
+          "response": [
+            {
+              "name": "Updated",
+              "status": "No Content",
+              "code": 204,
+              "body": ""
+            },
+            {
+              "name": "Not Found",
+              "status": "Not Found",
+              "code": 404,
+              "body": "{\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Content not found\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Content",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/content/{{contentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "content", "{{contentId}}"]
+            },
+            "description": "Deletes a content item by ID. Returns 204 No Content on success."
+          },
+          "response": [
+            {
+              "name": "Deleted",
+              "status": "No Content",
+              "code": 204,
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Example Flows",
+      "description": "Run these requests in order to walk through a complete workflow.",
+      "item": [
+        {
+          "name": "Flow 1 — Create then Read",
+          "item": [
+            {
+              "name": "Step 1: Create an Article idea",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Understanding Spring Profiles\",\n  \"description\": \"How to use dev and prod profiles in Spring Boot\",\n  \"status\": \"IDEA\",\n  \"type\": \"ARTICLE\",\n  \"dateCreated\": \"2026-04-14T09:00:00\",\n  \"dateUpdated\": \"2026-04-14T09:00:00\",\n  \"url\": null\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/content",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "content"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Step 2: Get all content (verify it was added)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/content",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "content"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Step 3: Get the new item by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/content/{{contentId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "content", "{{contentId}}"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Flow 2 — Lifecycle (Idea → Published → Delete)",
+          "item": [
+            {
+              "name": "Step 1: Create as IDEA",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Spring Boot Testing Guide\",\n  \"description\": \"Unit and integration testing in Spring Boot\",\n  \"status\": \"IDEA\",\n  \"type\": \"COURSE\",\n  \"dateCreated\": \"2026-04-14T08:00:00\",\n  \"dateUpdated\": \"2026-04-14T08:00:00\",\n  \"url\": null\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/content",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "content"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Step 2: Move to IN_PROGRESS",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": {{contentId}},\n  \"title\": \"Spring Boot Testing Guide\",\n  \"description\": \"Unit and integration testing in Spring Boot\",\n  \"status\": \"IN_PROGRESS\",\n  \"type\": \"COURSE\",\n  \"dateCreated\": \"2026-04-14T08:00:00\",\n  \"dateUpdated\": \"2026-04-14T09:00:00\",\n  \"url\": null\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/content/{{contentId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "content", "{{contentId}}"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Step 3: Publish with URL",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": {{contentId}},\n  \"title\": \"Spring Boot Testing Guide\",\n  \"description\": \"Unit and integration testing in Spring Boot\",\n  \"status\": \"PUBLISHED\",\n  \"type\": \"COURSE\",\n  \"dateCreated\": \"2026-04-14T08:00:00\",\n  \"dateUpdated\": \"2026-04-14T10:00:00\",\n  \"url\": \"https://danvega.dev/spring-testing\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/content/{{contentId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "content", "{{contentId}}"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Step 4: Delete it",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/content/{{contentId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "content", "{{contentId}}"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Step 5: Confirm 404 after delete",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/content/{{contentId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "content", "{{contentId}}"]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
